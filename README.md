@@ -3,8 +3,10 @@
 ## Description
 A straightforward CRUD (Create, Read, Update, Delete) application to manage a list of employees. Integrates MongoDB Backend with React Frontend.
 
-## Video Walkthrough 
-Google Drive Link- https://drive.google.com/file/d/1GOvKAu25EoSyLv7xbyNBwtpiMmS9qo4_/view?usp=sharing
+## Related Links 
+Live Link - https://employee-manager-7rut.vercel.app/
+Video Walkthrough - https://drive.google.com/file/d/1GOvKAu25EoSyLv7xbyNBwtpiMmS9qo4_/view?usp=sharing
+
 
 ## Features
 -Persists data locally.
