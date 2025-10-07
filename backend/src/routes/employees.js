@@ -83,3 +83,35 @@ router.delete('/:id', async (req, res) => {
 module.exports = router;
 
 
+
+    return res.json(updated);
+  } catch (err) {
+    console.error('Patch employee error:', err);
+    if (err.code === 11000) {
+      return res.status(409).json({ message: 'Email must be unique' });
+    }
+    return res.status(500).json({ message: 'Failed to update employee' });
+  }
+});
+
+// Delete
+router.delete('/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({ message: 'Database not connected' });
+    }
+    
+    const removed = await Employee.findByIdAndDelete(id);
+    if (!removed) return res.status(404).json({ message: 'Employee not found' });
+    return res.json({ message: 'Employee deleted' });
+  } catch (err) {
+    console.error('Delete employee error:', err);
+    return res.status(500).json({ message: 'Failed to delete employee' });
+  }
+});
+
+module.exports = router;
+
+
