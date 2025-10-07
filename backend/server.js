@@ -8,7 +8,7 @@ dotenv.config();
 
 const app = express();
 
-// More permissive CORS for development
+// CORS configuration
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow all origins in development, or specific origins in production
@@ -50,7 +50,10 @@ app.get('/', (_req, res) => {
 });
 
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok' });
+  res.json({ 
+    status: 'ok',
+    database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected'
+  });
 });
 
 app.use('/api/employees', require('./src/routes/employees'));
@@ -59,18 +62,27 @@ app.use('/api/employees', require('./src/routes/employees'));
 const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/employee_mvp';
 
 mongoose
-  .connect(mongoUri, { autoIndex: true })
+  .connect(mongoUri, { 
+    autoIndex: false, // Disable autoIndex to prevent duplicate index warnings
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
+  })
   .then(() => {
     console.log('Connected to MongoDB');
-    const port = process.env.PORT || 5000;
-    app.listen(port, () => {
-      console.log(`Server running on http://localhost:${port}`);
-    });
   })
   .catch((err) => {
-    console.error('Failed to connect to MongoDB', err);
-    process.exit(1);
+    console.error('Failed to connect to MongoDB:', err);
+    // Don't exit process in serverless environment
   });
+
+// Handle MongoDB connection events
+mongoose.connection.on('error', (err) => {
+  console.error('MongoDB connection error:', err);
+});
+
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB disconnected');
+});
 
 module.exports = app;
 
