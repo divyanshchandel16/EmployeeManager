@@ -8,20 +8,21 @@ dotenv.config();
 
 const app = express();
 
-// Middleware
+// More permissive CORS for development
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
+    // Allow all origins in development, or specific origins in production
+    if (process.env.NODE_ENV !== 'production' || !origin) {
+      return callback(null, true);
+    }
     
     const allowedOrigins = [
       'http://localhost:5173',
       'http://localhost:3000',
       process.env.FRONTEND_URL
-    ].filter(Boolean); // Remove undefined values
+    ].filter(Boolean);
     
-    // Check if origin is in allowed list
-    if (allowedOrigins.some(allowedOrigin => origin.startsWith(allowedOrigin))) {
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
       callback(new Error('Not allowed by CORS'));
@@ -30,6 +31,7 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 200
 };
+
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(morgan('dev'));
@@ -59,6 +61,7 @@ const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/employee_mv
 mongoose
   .connect(mongoUri, { autoIndex: true })
   .then(() => {
+    console.log('Connected to MongoDB');
     const port = process.env.PORT || 5000;
     app.listen(port, () => {
       console.log(`Server running on http://localhost:${port}`);
