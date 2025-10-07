@@ -19,6 +19,18 @@ app.use(express.json());
 app.use(morgan('dev'));
 
 // Routes
+app.get('/', (_req, res) => {
+  res.json({ 
+    message: 'Employee Manager API',
+    status: 'running',
+    version: '1.0.0',
+    endpoints: {
+      health: '/api/health',
+      employees: '/api/employees'
+    }
+  });
+});
+
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });
 });

@@ -24,8 +24,8 @@ const employeeSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-// Ensure unique index for email
-employeeSchema.index({ email: 1 }, { unique: true });
+// Remove the duplicate index - unique: true in schema already creates the index
+// employeeSchema.index({ email: 1 }, { unique: true });
 
 module.exports = mongoose.model('Employee', employeeSchema);
 
